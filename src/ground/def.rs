@@ -16,5 +16,6 @@ pub fn spawn_ground(
         Collider::rectangle(1920.0, 200.0),
         RigidBody::Static,
         CollisionLayers::new(GameLayer::Ground, LayerMask::ALL),
+        
     ));
 }

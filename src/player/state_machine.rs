@@ -2,7 +2,7 @@
 
 use bevy::prelude::*;
 use avian2d::prelude::*;
-use crate::player::def::{Player, PlayerState};
+use crate::player::def::{Player, PlayerState, XDirection};
 use crate::gamelayer::def::GameLayer;
 
 pub fn handle_grounded(
@@ -41,14 +41,32 @@ pub fn handle_jump_buffer(
 
 pub fn handle_x_movement(player: &mut Player, velocity: &mut LinearVelocity, keys: &Res<ButtonInput<KeyCode>>, time: &Res<Time>) {
         let mut move_direction = 0.0;
+        let left = keys.pressed(KeyCode::ArrowLeft);
+        let right = keys.pressed(KeyCode::ArrowRight);
+        let left_rel = keys.just_released(KeyCode::ArrowLeft);
+        let right_rel = keys.just_released(KeyCode::ArrowRight);
+        
 
-        if keys.pressed(KeyCode::ArrowLeft) {
-            move_direction -= 1.0
+        if left ^ right { // chuje sie wykluczaja
+            if left { player.x_primary = XDirection::Left; player.x_interrupt = XDirection::None }
+            else if right { player.x_primary = XDirection::Right; player.x_interrupt = XDirection::None }
         }
-        if keys.pressed(KeyCode::ArrowRight) {
-            move_direction += 1.0
+        else {
+
+            if player.x_primary == XDirection::Left && right { player.x_interrupt = XDirection::Right }
+            if player.x_primary == XDirection::Right && left { player.x_interrupt = XDirection::Left }
+
+            if left_rel && player.x_primary == XDirection::Left { player.x_interrupt = player.x_primary }
+            if right_rel && player.x_primary == XDirection::Right { player.x_interrupt = player.x_primary }
         }
 
+        if player.x_interrupt != XDirection::None {
+            move_direction = player.x_interrupt as i32 as f32;
+        }
+        else {
+            move_direction = player.x_primary as i32 as f32;
+        }
+        
         velocity.x = move_direction * player.movement_speed;
 
 }
@@ -58,9 +76,9 @@ pub fn fall_state(player: &mut Player, velocity: &mut LinearVelocity, gravity_sc
     
     // player.coyote_timer.tick(time.delta());
 
-    if keys.pressed(KeyCode::ArrowDown) {
-        gravity_scale.0 = 2.5;
-    }
+    // if keys.pressed(KeyCode::ArrowDown) {
+    //     gravity_scale.0 = 7.0;
+    // }
 
     velocity.y = velocity.y.max(-600.0);
 
@@ -90,6 +108,16 @@ pub fn consider_jump(player: &mut Player, velocity: &mut LinearVelocity, gravity
         gravity_scale.0 = 1.0;
         player.change_state(PlayerState::Jump);
     }
+
+}
+
+pub fn consider_drill(player: &mut Player, velocity: &mut LinearVelocity, gravity_scale: &mut GravityScale, keys: &Res<ButtonInput<KeyCode>>, time: &Res<Time>) {
+    if keys.pressed(KeyCode::KeyX) {
+
+    }
+}
+
+pub fn drill_state() {
 
 }
 

@@ -3,6 +3,13 @@ use avian2d::prelude::*;
 
 use crate::player::state_machine::{handle_grounded, handle_jump_buffer, handle_states};
 
+#[derive(PartialEq, Eq, Clone, Copy)]
+pub enum XDirection {
+    Left = -1,
+    Right = 1,
+    None = 0
+}
+
 pub enum PlayerState {
     Idle,
     Walk,
@@ -23,6 +30,8 @@ pub struct Player {
     pub jump_buffer: Timer,
     pub jump_buffer_active: bool,
     pub jump_strength: f32,
+    pub x_interrupt: XDirection,
+    pub x_primary: XDirection,
     
     pub coyote_timer: Timer,
 
@@ -43,6 +52,8 @@ impl Default for Player {
             jump_exhaust: Timer::from_seconds(2.0, TimerMode::Repeating),
             jump_strength: 600.0,
             jump_buffer_active: false,
+            x_primary: XDirection::None,
+            x_interrupt: XDirection::None,
 
             state: PlayerState::Walk,
 
@@ -82,6 +93,7 @@ pub fn spawn_player(
     RigidBody::Dynamic,
     LockedAxes::ROTATION_LOCKED,
     GravityScale(1.0),
+    
     )
     );
 }   
