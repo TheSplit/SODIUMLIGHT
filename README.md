@@ -1,2 +1,2 @@
-# SODIUMLIGHT
-A simple 2d platforming system prototype.
+# SODIUMLIGHT [WIP]
+A WIP simple 2d platforming system prototype.
